@@ -18,7 +18,7 @@
 
 #include "dserv.h"
 
-struct host_online *ho_first=NULL, *ho_last=NULL;
+struct host_online *ho_first=NULL;
 
 struct host_online *
 find_host(char *host)
@@ -61,11 +61,8 @@ create_host(char *host)
  ho->conn_freq = 1; ho->last_conn_time = cur_time;
  ho->conn_count = 0;
  ho->next = NULL;
- if (ho_last)
-   ho_last->next = ho;
- else
-   ho_first = ho;
- ho_last = ho;
+ ho->next = ho_first;
+ ho_first = ho;
  if (!(he = hash[(hv=hash_text(host))]))
    {
     hash[hv] = alloc_block(bh_hash_entry);
@@ -131,7 +128,7 @@ connect_host(char *host, unsigned long ts)
 void
 cleanup_hosts(void)
 {
- struct host_online *ho, *nho;
+ struct host_online *ho, *nho, **lho = &ho_first;
  static unsigned long last_ts=0;
  if (cur_time-last_ts < 30)
    return;
@@ -145,8 +142,15 @@ cleanup_hosts(void)
     	delta = (cur_time-ho->last_conn_time) / 30;
     	ho->last_conn_time = cur_time - (cur_time-ho->last_conn_time) % 30;
     	if (ho->conn_freq > delta)
-    	  ho->conn_freq -= delta;
+    	  {
+    	   ho->conn_freq -= delta;
+    	   *lho = ho;
+    	   lho = &ho->next;
+    	  }
     	else
-    	  delete_host(ho);
+    	  {
+    	   *lho = ho->next;
+    	   delete_host(ho);
+    	  }
     }
 }

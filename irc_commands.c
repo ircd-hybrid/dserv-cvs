@@ -976,8 +976,8 @@ pm_on (struct net_server *ns, int argc, char **args, char *real)
 	{
 	  send_client (serv,
 		       ":%s NOTICE %s :Usage: ON #channel password [MASSDEOP|OP who"
-		       "|DEOP who|MODE -[k][l][i]|UNBAN who]", servicesname,
-		       real);
+		       "|DEOP who|MODE -[k][l][i]|UNBAN who]",
+		       servicesname, real);
 	  return;
 	}
       fcs = change;
@@ -1028,6 +1028,21 @@ pm_on (struct net_server *ns, int argc, char **args, char *real)
       send_client (serv, ":%s MODE %s -b %s", servicesname, ircc->name,
 		   args[4]);
     }
+#ifdef USE_UNDENY
+  else if (!strcasecmp (args[3], "UNDENY"))
+    {
+      if (argc < 5)
+	{
+	  send_client (serv,
+		       ":%s NOTICE %s :Usage: ON #channel password [MASSDEOP|OP who"
+		       "|DEOP who|MODE -[k][l][i]|UNBAN who]", servicesname,
+		       real);
+	  return;
+	}
+      send_client (serv, ":%s MODE %s -d %s", servicesname, ircc->name,
+		   args[4]);
+    }
+#endif
   else
     {
       send_client (serv,
