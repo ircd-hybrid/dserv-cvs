@@ -277,6 +277,7 @@ m_nick (struct net_server *ns, int argc, char **args)
       hash[hv] = he;
       return;
     }
+  phe = fhe;
   while ((fhe = fhe->next))
     phe = fhe;
   phe->next = he;

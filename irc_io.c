@@ -22,7 +22,7 @@ void read_server_line (struct net_connection *, char *);
 void close_server_connection (struct net_connection *, char *);
 
 extern unsigned long server_addr;
-extern struct command *commands;
+extern struct command commands[];
 
 void
 resolve_server (void)

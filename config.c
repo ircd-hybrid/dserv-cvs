@@ -134,11 +134,11 @@ parse_config_line (char *l, unsigned long i)
       int iv;
       for (iv = 0; names[iv] && strcasecmp (names[iv], "NAME"); iv++);
       opname = values[iv];
-      if (strlen (opname) > 20)
+      if (opname && strlen (opname) > 20)
 	return config_error ("Op names must not exceed 20b long.", i);
       for (iv = 0; names[iv] && strcasecmp (names[iv], "PASSWORD"); iv++);
       pass = values[iv];
-      if (strlen (pass) > 20)
+      if (pass && strlen (pass) > 20)
 	return config_error ("Op passwords must not exceed 20b long.", i);
       for (iv = 0; names[iv] && strcasecmp (names[iv], "ACCESS"); iv++);
       access = values[iv];

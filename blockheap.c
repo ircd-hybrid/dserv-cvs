@@ -59,6 +59,25 @@ setup_blockheaps (void)
   SetupHeap (link_from_services, 32);
 }
 
+#if 1
+BlockHeap *
+create_blockheap (unsigned long block_size, unsigned long alloc_at_once)
+{
+ return (BlockHeap*)block_size;
+}
+
+void *
+alloc_block(BlockHeap *bh)
+{
+ return malloc((unsigned long)bh);
+}
+
+void
+free_block(BlockHeap *bh, void *ptr)
+{
+ free(ptr);
+}
+#else
 BlockHeap *
 create_blockheap (unsigned long block_size, unsigned long alloc_at_once)
 {
@@ -201,3 +220,4 @@ free_block (BlockHeap * bh, void *ptr)
      problem - A1kmm.
    */
 }
+#endif
