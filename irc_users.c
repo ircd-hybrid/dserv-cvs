@@ -89,23 +89,16 @@ process_client_quit (struct irc_user *ircu)
 }
 
 void
-process_server_quit (struct net_server *ns)
+process_one_server_quit (struct net_server *ns)
 {
-  struct net_server *cns, *ncns;
   struct irc_user *ircu, *nircu;
   if (!ns)
     return;
-  for (cns = first_conn_serv; cns; cns = ncns)
-    {
-      ncns = cns->next;
-      if (cns->uplink == ns)
-	process_server_quit (cns);
-    }
   for (ircu = first_user; ircu; ircu = nircu)
     {
       nircu = ircu->next;
       if (ircu->server == ns)
-	process_client_quit (ircu);
+	    process_client_quit (ircu);
     }
   if (ns->prev)
     {
@@ -131,6 +124,19 @@ process_server_quit (struct net_server *ns)
     }
   /* And free it!! - A1kmm */
   free_block (bh_net_server, ns);
+}
+
+void
+process_server_quit (struct net_server *ns)
+{
+ struct net_server *cns, *c2ns, *ncns;
+ for (cns = first_conn_serv; cns; cns = ncns)
+   {
+    ncns = cns->next;
+    for (c2ns = cns; c2ns && c2ns != ns; c2ns = c2ns->uplink);
+    if (c2ns)
+      process_one_server_quit(c2ns);
+   }
 }
 
 struct irc_user *

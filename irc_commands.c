@@ -821,8 +821,12 @@ pm_suspend (struct net_server *ns, int argc, char **args, char *real)
 		       change_m, icu->user->name, icu->user->name);
 	  icu->flags &= ~(CHANUFLAG_OPPED & CHANUFLAG_VOICED);
 	}
+	  if (type)
+	    send_client(serv,
+	       ":%s TOPIC %s :Note: This channel is suspended.", servicesname,
+	       args[1]);
       if (type == SUSPEND_SILENCE)
-	send_client (serv, ":%s MODE %s +psmnti", servicesname, args[1]);
+	    send_client(serv, ":%s MODE %s +psmnti", servicesname, args[1]);
     }
   /* Should we record this suspension? */
   if (!type || sus_c)

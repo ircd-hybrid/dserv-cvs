@@ -89,14 +89,8 @@ get_user_on_channel (struct irc_channel *ic, struct irc_user *iu)
 void
 add_chanu (struct irc_channel *chan, struct irc_chan_user *u)
 {
-  u->next = NULL;
-  if (chan->last_u)
-    {
-      chan->last_u->next = u;
-    }
-  else
-    chan->first_u = u;
-  chan->last_u = u;
+  u->next = chan->first_u;
+  chan->first_u = u;
 }
 
 void
@@ -113,8 +107,6 @@ delete_chanu (struct irc_channel *chan, struct irc_chan_user *u)
     }
   else
     chan->first_u = u->next;
-  if (!u->next)
-    chan->last_u = NULL;
   free_block (bh_irc_chan_user, u);
 }
 
@@ -381,19 +373,21 @@ m_sjoin (struct net_server *ns, int argc, char **argp)
   chan->flags = mode;
   for (cf = 0; cf < uc; cf++)
     {
-      /* Skip users we know are on the channel. */
-      if (get_user_on_channel (chan, users[uc]))
-	{
-	  puts ("Duplicate user on channel for SJOIN received.");
-	  continue;
-	}
-      chanu = alloc_block (bh_irc_chan_user);
-      chanu->user = users[cf];
-      chanu->flags = u_flags[cf];
-      add_chanu (chan, chanu);
+     /* Skip users we know are on the channel. */
+     if (get_user_on_channel (chan, users[cf]))
+       {
+        puts ("Duplicate user on channel for SJOIN received.");
+        chanu->flags = u_flags[cf];
+        continue;
+       }
+     chanu = alloc_block (bh_irc_chan_user);
+     chanu->user = users[cf];
+     chanu->flags = u_flags[cf];
+     add_chanu (chan, chanu);
     }
+  /* If we are seeing this, we are not a hub so we can believe the TS */
   chan->chan_ts = strtoul (argp[2], NULL, 10);
-  /* We need TS to work... */
+  /* We need a TS to work... */
   if (!(chan->chan_ts))
     return;
   /* If the channel is suspended, tell the sender if from services, if it is massdeop then do the
@@ -404,6 +398,10 @@ m_sjoin (struct net_server *ns, int argc, char **argp)
       if (ns->lts)
 	send_client (ns->lts->services, "3 SUSPEND %s %u", chan->name,
 		     susc->type);
+	  if (susc->type)
+	    send_client(serv,
+	       ":%s TOPIC %s :Note: This channel is suspended.", servicesname,
+	       chan->name);
       if (susc->type > SUSPEND_DONTMANAGE)
 	for (chanu = chan->first_u; chanu; chanu = chanu->next)
 	  {
