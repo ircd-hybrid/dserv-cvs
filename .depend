@@ -1,0 +1,13 @@
+commands.o: commands.c inc/dserv.h
+dserv.o: dserv.c inc/dserv.h
+irc_commands.o: irc_commands.c inc/dserv.h
+irc_io.o: irc_io.c inc/dserv.h
+irc_users.o: irc_users.c inc/dserv.h
+net.o: net.c inc/dserv.h
+svc_io.o: svc_io.c inc/dserv.h
+irc_channel.o: irc_channel.c inc/dserv.h
+database.o: database.c inc/dserv.h
+config.o: config.c inc/dserv.h
+oomon_io.o: oomon_io.c inc/dserv.h
+blockheap.o: blockheap.c inc/dserv.h
+clones.o: clones.c inc/dserv.h
